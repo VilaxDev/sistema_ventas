@@ -20,18 +20,18 @@ Este proyecto es un sistema de ventas desarrollado para gestionar productos, cli
 
 1. Clona el repositorio:
     ```bash
-    git clone https://github.com/vilaxDev/sistema_ventas.git
+    git clone https://github.com/VilaxDev/sistema_ventas.git
     ```
 2. Instala las dependencias:
     ```bash
-    [npm install]
+    npm install
     ```
 3. Configura la base de datos utilizando el archivo de ejemplo proporcionado (`database.sql`).  
     Se recomienda usar un motor de base de datos como XAMPP para MySQL. Importa el archivo en tu gestor de bases de datos antes de iniciar la aplicación.
 
 4. Inicia la aplicación:
     ```bash
-    [npm start]
+    npm start
     ```
 
 ## Uso
@@ -44,4 +44,4 @@ Las contribuciones son bienvenidas. Por favor, abre un issue o pull request para
 
 ## Licencia
 
-[Especificar licencia, MIT]
+[MIT]
