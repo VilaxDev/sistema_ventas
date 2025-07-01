@@ -1,0 +1,69 @@
+<% layout('layout') %>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="bi bi-pencil"></i> Editar Producto
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/productos/<%= producto.id %>?_method=PUT">
+                    <div class="mb-3">
+                        <label for="nombre" class="form-label">Nombre del Producto</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               value="<%= producto.nombre %>" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" 
+                                  rows="3"><%= producto.descripcion || '' %></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="precio" class="form-label">Precio (S/.)</label>
+                                <input type="number" class="form-control" id="precio" name="precio" 
+                                       step="0.01" min="0" value="<%= producto.precio %>" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="stock" class="form-label">Stock</label>
+                                <input type="number" class="form-control" id="stock" name="stock" 
+                                       min="0" value="<%= producto.stock %>" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="categoria" class="form-label">Categoría</label>
+                        <select class="form-select" id="categoria" name="categoria">
+                            <option value="">Seleccionar categoría</option>
+                            <option value="Alimentos" <%= producto.categoria === 'Alimentos' ? 'selected' : '' %>>Alimentos</option>
+                            <option value="Bebidas" <%= producto.categoria === 'Bebidas' ? 'selected' : '' %>>Bebidas</option>
+                            <option value="Conservas" <%= producto.categoria === 'Conservas' ? 'selected' : '' %>>Conservas</option>
+                            <option value="Lácteos" <%= producto.categoria === 'Lácteos' ? 'selected' : '' %>>Lácteos</option>
+                            <option value="Panadería" <%= producto.categoria === 'Panadería' ? 'selected' : '' %>>Panadería</option>
+                            <option value="Limpieza" <%= producto.categoria === 'Limpieza' ? 'selected' : '' %>>Limpieza</option>
+                            <option value="Cuidado Personal" <%= producto.categoria === 'Cuidado Personal' ? 'selected' : '' %>>Cuidado Personal</option>
+                            <option value="Otros" <%= producto.categoria === 'Otros' ? 'selected' : '' %>>Otros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="/productos" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Actualizar Producto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

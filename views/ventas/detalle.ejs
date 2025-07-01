@@ -1,0 +1,152 @@
+<% layout('layout') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <div class="card">
+      <div
+        class="card-header d-flex justify-content-between align-items-center"
+      >
+        <h4 class="mb-0">
+          <i class="bi bi-receipt"></i> Detalle de Venta #<%= venta.id %>
+        </h4>
+        <span
+          class="badge bg-<%= venta.estado === 'completada' ? 'success' : venta.estado === 'pendiente' ? 'warning' : 'danger' %> fs-6"
+        >
+          <%= venta.estado.charAt(0).toUpperCase() + venta.estado.slice(1) %>
+        </span>
+      </div>
+      <div class="card-body">
+        <!-- Información de la venta -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h6 class="fw-bold">Información de la Venta</h6>
+            <p class="mb-1"><strong>ID:</strong> #<%= venta.id %></p>
+            <p class="mb-1">
+              <strong>Fecha:</strong> <%= new
+              Date(venta.fecha_venta).toLocaleDateString('es-PE') %>
+            </p>
+            <p class="mb-1">
+              <strong>Hora:</strong><%= new
+              Date(venta.fecha_venta).toLocaleTimeString('es-PE') %>
+            </p>
+          </div>
+          <div class="col-md-6">
+            <h6 class="fw-bold">Información del Cliente</h6>
+            <p class="mb-1">
+              <strong>Nombre:</strong><%= venta.cliente_nombre || 'Cliente Anónimo' %>
+            </p>
+            <% if (venta.cliente_email) { %>
+            <p class="mb-1">
+              <strong>Email:</strong> <%= venta.cliente_email %>
+            </p>
+            <% } %>
+          </div>
+        </div>
+
+        <hr />
+
+        <!-- Productos vendidos -->
+        <h6 class="fw-bold mb-3">Productos Vendidos</h6>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Producto</th>
+                <th class="text-center">Cantidad</th>
+                <th class="text-end">Precio Unit.</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% detalles.forEach(detalle => { %>
+              <tr>
+                <td><%= detalle.producto_nombre %></td>
+                <td class="text-center"><%= detalle.cantidad %></td>
+                <td class="text-end">
+                  S/. <%= Number(detalle.precio_unitario).toFixed(2) %>
+                </td>
+                <td class="text-end price">
+                  S/. <%= Number(detalle.subtotal).toFixed(2) %>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+            <tfoot class="table-dark">
+              <tr>
+                <td colspan="3" class="text-end fw-bold">TOTAL:</td>
+                <td class="text-end fw-bold fs-5 text-success">
+                  S/. <%=  Number(venta.total).toFixed(2) %>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Resumen -->
+        <div class="row mt-4">
+          <div class="col-md-6"></div>
+          <div class="col-md-6">
+            <div class="card bg-light">
+              <div class="card-body">
+                <h6 class="card-title">Resumen de la Venta</h6>
+                <div class="d-flex justify-content-between">
+                  <span>Productos:</span>
+                  <span><%= detalles.length %> tipos</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>Cantidad total:</span>
+                  <span
+                    ><%= detalles.reduce((sum, d) => sum + d.cantidad, 0) %>
+                    unidades</span
+                  >
+                </div>
+                <hr />
+                <div class="d-flex justify-content-between fw-bold">
+                  <span>Total Pagado:</span>
+                  <span class="text-success"
+                    >S/. <%= Number(venta.total).toFixed(2) %></span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="d-flex justify-content-between">
+          <a href="/ventas" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver a Ventas
+          </a>
+          <div>
+            <button class="btn btn-outline-primary" onclick="window.print()">
+              <i class="bi bi-printer"></i> Imprimir
+            </button>
+            <a href="/ventas/nueva" class="btn btn-success">
+              <i class="bi bi-plus-circle"></i> Nueva Venta
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media print {
+    .btn,
+    .navbar,
+    .card-header .badge {
+      display: none !important;
+    }
+
+    .card {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    body {
+      background: white !important;
+    }
+  }
+</style>

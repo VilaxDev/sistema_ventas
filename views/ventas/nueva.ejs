@@ -1,0 +1,281 @@
+<% layout('layout') %>
+
+<div class="row justify-content-center">
+  <div class="col-md-10">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="mb-0"><i class="bi bi-plus-circle"></i> Nueva Venta</h4>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/ventas" id="ventaForm">
+          <!-- Información del cliente -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <label for="cliente_nombre" class="form-label"
+                >Nombre del Cliente</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="cliente_nombre"
+                name="cliente_nombre"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="cliente_email" class="form-label"
+                >Email del Cliente</label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="cliente_email"
+                name="cliente_email"
+              />
+            </div>
+          </div>
+
+          <hr />
+
+          <!-- Productos -->
+          <h5 class="mb-3">Productos</h5>
+          <div id="productosContainer">
+            <div class="producto-item row mb-3 align-items-end">
+              <div class="col-md-5">
+                <label class="form-label">Producto</label>
+                <select
+                  class="form-select producto-select"
+                  name="productos[0][id]"
+                  required
+                  onchange="actualizarPrecio(this, 0)"
+                >
+                  <option value="">Seleccionar producto</option>
+                  <% productos.forEach(producto => { %>
+                  <option
+                    value="<%= producto.id %>"
+                    data-precio="<%= producto.precio %>"
+                    data-stock="<%= producto.stock %>"
+                  >
+                    <%= producto.nombre %> - S/. <%=
+                    Number(producto.precio).toFixed(2) %> (Stock: <%=
+                    producto.stock %>)
+                  </option>
+                  <% }) %>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Cantidad</label>
+                <input
+                  type="number"
+                  class="form-control cantidad-input"
+                  name="productos[0][cantidad]"
+                  min="1"
+                  value="1"
+                  required
+                  onchange="calcularSubtotal(0)"
+                />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Precio Unit.</label>
+                <input
+                  type="text"
+                  class="form-control precio-unitario"
+                  readonly
+                />
+              </div>
+              <div class="col-md-2">
+                <label class="form-label">Subtotal</label>
+                <input type="text" class="form-control subtotal" readonly />
+              </div>
+              <div class="col-md-1">
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  onclick="eliminarProducto(this)"
+                  disabled
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="btn btn-outline-primary mb-3"
+            onclick="agregarProducto()"
+          >
+            <i class="bi bi-plus"></i> Agregar Producto
+          </button>
+
+          <!-- Total -->
+          <div class="row">
+            <div class="col-md-8"></div>
+            <div class="col-md-4">
+              <div class="card bg-light">
+                <div class="card-body">
+                  <h5 class="card-title">Total a Pagar</h5>
+                  <h3 class="text-success" id="totalGeneral">S/. 0.00</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="d-flex justify-content-between">
+            <a href="/ventas" class="btn btn-secondary">
+              <i class="bi bi-arrow-left"></i> Volver
+            </a>
+            <button type="submit" class="btn btn-success">
+              <i class="bi bi-check-circle"></i> Realizar Venta
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let contadorProductos = 1;
+
+  function agregarProducto() {
+    const container = document.getElementById("productosContainer");
+    const nuevoProducto = document.createElement("div");
+    nuevoProducto.className = "producto-item row mb-3 align-items-end";
+    nuevoProducto.innerHTML = `
+        <div class="col-md-5">
+            <label class="form-label">Producto</label>
+            <select class="form-select producto-select" name="productos[${contadorProductos}][id]" required onchange="actualizarPrecio(this, ${contadorProductos})">
+                <option value="">Seleccionar producto</option>
+                <% productos.forEach(producto => { %>
+                    <option value="<%= producto.id %>" data-precio="<%= producto.precio %>" data-stock="<%= producto.stock %>">
+                        <%= producto.nombre %> - S/. <%= Number(producto.precio).toFixed(2) %> (Stock: <%= producto.stock %>)
+                    </option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Cantidad</label>
+            <input type="number" class="form-control cantidad-input" name="productos[${contadorProductos}][cantidad]" 
+                   min="1" value="1" required onchange="calcularSubtotal(${contadorProductos})">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Precio Unit.</label>
+            <input type="text" class="form-control precio-unitario" readonly>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Subtotal</label>
+            <input type="text" class="form-control subtotal" readonly>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarProducto(this)">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    `;
+    container.appendChild(nuevoProducto);
+    contadorProductos++;
+    actualizarBotonesEliminar();
+  }
+
+  function eliminarProducto(btn) {
+    btn.closest(".producto-item").remove();
+    calcularTotal();
+    actualizarBotonesEliminar();
+  }
+
+  function actualizarBotonesEliminar() {
+    const productos = document.querySelectorAll(".producto-item");
+    productos.forEach((producto, index) => {
+      const btn = producto.querySelector(".btn-danger");
+      btn.disabled = productos.length === 1;
+    });
+  }
+
+  function actualizarPrecio(select, index) {
+    const option = select.selectedOptions[0];
+    const precio = option.dataset.precio || 0;
+    const stock = option.dataset.stock || 0;
+
+    const container = select.closest(".producto-item");
+    const precioInput = container.querySelector(".precio-unitario");
+    const cantidadInput = container.querySelector(".cantidad-input");
+
+    precioInput.value = precio ? `S/. ${parseFloat(precio).toFixed(2)}` : "";
+    cantidadInput.max = stock;
+
+    calcularSubtotal(index);
+  }
+
+  function calcularSubtotal(index) {
+    const productos = document.querySelectorAll(".producto-item");
+    const producto = productos[index];
+
+    const select = producto.querySelector(".producto-select");
+    const cantidadInput = producto.querySelector(".cantidad-input");
+    const subtotalInput = producto.querySelector(".subtotal");
+
+    const option = select.selectedOptions[0];
+    const precio = parseFloat(option.dataset.precio || 0);
+    const cantidad = parseInt(cantidadInput.value || 0);
+    const stock = parseInt(option.dataset.stock || 0);
+
+    if (cantidad > stock) {
+      alert(`Stock insuficiente. Máximo disponible: ${stock}`);
+      cantidadInput.value = stock;
+      return;
+    }
+
+    const subtotal = precio * cantidad;
+    subtotalInput.value = subtotal > 0 ? `S/. ${subtotal.toFixed(2)}` : "";
+
+    calcularTotal();
+  }
+
+  function calcularTotal() {
+    let total = 0;
+    const productos = document.querySelectorAll(".producto-item");
+
+    productos.forEach((producto) => {
+      const select = producto.querySelector(".producto-select");
+      const cantidadInput = producto.querySelector(".cantidad-input");
+
+      if (select.value && cantidadInput.value) {
+        const option = select.selectedOptions[0];
+        const precio = parseFloat(option.dataset.precio || 0);
+        const cantidad = parseInt(cantidadInput.value || 0);
+        total += precio * cantidad;
+      }
+    });
+
+    document.getElementById("totalGeneral").textContent = `S/. ${total.toFixed(
+      2
+    )}`;
+  }
+
+  // Validar formulario antes de enviar
+  document.getElementById("ventaForm").addEventListener("submit", function (e) {
+    const productos = document.querySelectorAll(".producto-select");
+    let productosValidos = 0;
+
+    productos.forEach((select) => {
+      if (select.value) productosValidos++;
+    });
+
+    if (productosValidos === 0) {
+      e.preventDefault();
+      alert("Debe seleccionar al menos un producto");
+      return;
+    }
+
+    const total = parseFloat(
+      document.getElementById("totalGeneral").textContent.replace("S/. ", "")
+    );
+    if (total <= 0) {
+      e.preventDefault();
+      alert("El total debe ser mayor a 0");
+      return;
+    }
+  });
+</script>
