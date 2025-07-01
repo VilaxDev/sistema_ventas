@@ -26,7 +26,7 @@ Este proyecto es un sistema de ventas desarrollado para gestionar productos, cli
     ```bash
     npm install
     ```
-3. Configura la base de datos utilizando el archivo de ejemplo proporcionado (`database.sql`).  
+3. Configura la base de datos utilizando el archivo de ejemplo proporcionado (`sistema_ventas.sql`).  
     Se recomienda usar un motor de base de datos como XAMPP para MySQL. Importa el archivo en tu gestor de bases de datos antes de iniciar la aplicación.
 
 4. Inicia la aplicación:
