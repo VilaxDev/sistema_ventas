@@ -1,18 +1,29 @@
 const mysql = require("mysql2");
+const { URL } = require("url");
 require("dotenv").config();
 
-// Configuración de la base de datos usando variables de entorno
+// Parseamos la DATABASE_URL
+const dbUrl = new URL(process.env.DATABASE_URL);
+
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+  host: dbUrl.hostname,
+  user: dbUrl.username,
+  password: dbUrl.password,
+  database: dbUrl.pathname.replace("/", ""),
+  port: dbUrl.port,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
+  connectionLimit: 20,
+  idleTimeout: 30000,
+  connectTimeout: 2000,
 });
-// Conectar a la base de datos
-console.log("Pool de MySQL creado correctamente");
+
+db.getConnection((err, connection) => {
+  if (err) {
+    console.error("Database connection error:", err);
+  } else {
+    console.log("Connected to MySQL database (pool)");
+    connection.release();
+  }
+});
 
 module.exports = db;
