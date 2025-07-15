@@ -11,6 +11,9 @@ const db = mysql.createPool({
   password: dbUrl.password,
   database: dbUrl.pathname.replace("/", ""),
   port: dbUrl.port,
+  ssl: {
+    rejectUnauthorized: false, // importante para conexiones en la nube
+  },
   waitForConnections: true,
   connectionLimit: 20,
   idleTimeout: 30000,
